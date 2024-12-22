@@ -5,14 +5,16 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
-import page_object.OrderPage;
+import object.page.OrderPage;
+import utilits.BrowserUtilits;
+import utilits.WebDriverFactory;
 
 import static constans.Locators.*;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(Parameterized.class)
 public class OrderPageParameterizedTest {
+    private static final String BROWSER_NAME = "CHROME";
     private WebDriver driver;
 
     private String name;
@@ -24,9 +26,9 @@ public class OrderPageParameterizedTest {
     private By rentalPeriod;
     private By colour;
     private String comment;
-    private String variantButton;
+    private String positionButton;
 
-    public OrderPageParameterizedTest(String name, String surname, String address, By station, String phone, By date, By rentalPeriod, By colour, String comment, String variantButton) {
+    public OrderPageParameterizedTest(String name, String surname, String address, By station, String phone, By date, By rentalPeriod, By colour, String comment, String positionButton) {
         this.name = name;
         this.surname = surname;
         this.address = address;
@@ -36,7 +38,7 @@ public class OrderPageParameterizedTest {
         this.rentalPeriod = rentalPeriod;
         this.colour = colour;
         this.comment = comment;
-        this.variantButton = variantButton;
+        this.positionButton = positionButton;
     }
 
     @Parameterized.Parameters
@@ -49,28 +51,23 @@ public class OrderPageParameterizedTest {
 
     @Before
     public void before() {
-        driver = new ChromeDriver();
+        driver = WebDriverFactory.openBrowser(BROWSER_NAME);
+        driver.manage().window().maximize();
     }
 
     @Test
     public void validationOrderTest() {
         driver.get(URL);
         OrderPage objectOrderPage = new OrderPage(driver);
-        objectOrderPage.clickButton(By.id("rcc-confirm-button"));
-        By orderButton = null;
-        if (variantButton.equals("Верхняя")) {
-            orderButton = TOP_ORDER_BUTTON;
-        } else if (variantButton.equals("Нижняя")) {
-            objectOrderPage.scrollForElement(BOTTOM_ORDER_BUTTON);
-            orderButton = BOTTOM_ORDER_BUTTON;
-        }
-        objectOrderPage.clickButton(orderButton);
+        objectOrderPage.clickButton(ACCEPT_COOKIE);
+        objectOrderPage.selectButton(positionButton);
         objectOrderPage.order(name, surname, address, station, phone, date, rentalPeriod, colour, comment);
         assertEquals(true, driver.findElement(ORDER_PLACED).isDisplayed());
     }
 
     @After
     public void tearDown() {
-        driver.quit();
+        BrowserUtilits closeBrowser = new BrowserUtilits(driver);
+        closeBrowser.tearDown();
     }
 }
