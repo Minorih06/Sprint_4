@@ -6,15 +6,23 @@ import org.junit.runners.Parameterized;
 import org.openqa.selenium.WebDriver;
 import object.page.HomePage;
 import utilits.BrowserUtilits;
-import utilits.WebDriverFactory;
 
-import static constans.Locators.*;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(Parameterized.class)
 public class HomePageParameterizedTest {
     private static final String BROWSER_NAME = "CHROME";
+    private BrowserUtilits browserUtilits;
     private WebDriver driver;
+
+    private static final String HOW_MUCH_QUESTION = "Сколько это стоит? И как оплатить?";
+    private static final String SOME_SCOOTER_QUESTION = "Хочу сразу несколько самокатов! Так можно?";
+    private static final String RENTAL_TIME_CALCULATION_QUESTION = "Как рассчитывается время аренды?";
+    private static final String ORDER_IN_ONE_DAY_QUESTION = "Можно ли заказать самокат прямо на сегодня?";
+    private static final String EXTENSION_OR_REFUND_QUESTION = "Можно ли продлить заказ или вернуть самокат раньше?";
+    private static final String CHARGING_FROM_SCOOTER_QUESTION = "Вы привозите зарядку вместе с самокатом?";
+    private static final String CANCEL_ORDER_QUESTION = "Можно ли отменить заказ?";
+    private static final String DELIVERY_AREA_QUESTION = "Я жизу за МКАДом, привезёте?";
 
     private static final String HOW_MUCH_ANSWER_EXPECTED = "Сутки — 400 рублей. Оплата курьеру — наличными или картой.";
     private static final String SOME_SCOOTERS_ANSWER_EXPECTED = "Пока что у нас так: один заказ — один самокат. Если хотите покататься с друзьями, можете просто сделать несколько заказов — один за другим.";
@@ -36,35 +44,35 @@ public class HomePageParameterizedTest {
     @Parameterized.Parameters
     public static Object[][] getContents() {
         return new Object[][] {
-                {"Сколько это стоит? И как оплатить?", HOW_MUCH_ANSWER_EXPECTED},
-                {"Хочу сразу несколько самокатов! Так можно?", SOME_SCOOTERS_ANSWER_EXPECTED},
-                {"Как рассчитывается время аренды?", RENTAL_TIME_CALCULATION_ANSWER_EXPECTED},
-                {"Можно ли заказать самокат прямо на сегодня?", ORDER_IN_ONE_DAY_ANSWER_EXPECTED},
-                {"Можно ли продлить заказ или вернуть самокат раньше?", EXTENSION_OR_REFUND_ANSWER_EXPECTED},
-                {"Вы привозите зарядку вместе с самокатом?", CHARGING_FROM_SCOOTER_ANSWER_EXPECTED},
-                {"Можно ли отменить заказ?", CANCEL_ORDER_ANSWER_EXPECTED},
-                {"Я жизу за МКАДом, привезёте?", DELIVERY_AREA_ANSWER_EXPECTED}
+                {HOW_MUCH_QUESTION, HOW_MUCH_ANSWER_EXPECTED},
+                {SOME_SCOOTER_QUESTION, SOME_SCOOTERS_ANSWER_EXPECTED},
+                {RENTAL_TIME_CALCULATION_QUESTION, RENTAL_TIME_CALCULATION_ANSWER_EXPECTED},
+                {ORDER_IN_ONE_DAY_QUESTION, ORDER_IN_ONE_DAY_ANSWER_EXPECTED},
+                {EXTENSION_OR_REFUND_QUESTION, EXTENSION_OR_REFUND_ANSWER_EXPECTED},
+                {CHARGING_FROM_SCOOTER_QUESTION, CHARGING_FROM_SCOOTER_ANSWER_EXPECTED},
+                {CANCEL_ORDER_QUESTION, CANCEL_ORDER_ANSWER_EXPECTED},
+                {DELIVERY_AREA_QUESTION, DELIVERY_AREA_ANSWER_EXPECTED}
         };
     }
 
     @Before
     public void before() {
-        driver = WebDriverFactory.openBrowser(BROWSER_NAME);
+        browserUtilits = new BrowserUtilits(BROWSER_NAME);
+        driver = browserUtilits.getDriver();
         driver.manage().window().maximize();
     }
 
     @Test
     public void matchesTheContentAccordion() {
-        driver.get(URL);
+        driver.get(browserUtilits.getURL());
         HomePage objectHomePage = new HomePage(driver);
-        objectHomePage.buttonClick(ACCEPT_COOKIE);
+        objectHomePage.buttonClick(objectHomePage.getACCEPT_COOKIE());
         assertEquals(answer, objectHomePage.trueAnswer(question));
     }
 
     @After
     public void after() {
-        BrowserUtilits closeBrowser = new BrowserUtilits(driver);
-        closeBrowser.tearDown();
+        browserUtilits.tearDown();
     }
 }
 
